@@ -1,0 +1,48 @@
+# Optional GPU acceleration override.
+#
+# Default `docker compose up` runs WITHOUT GPU passthrough so it works on any
+# host. To enable a GPU, pick ONE section below and remove the other.
+#
+#   NVIDIA:  `docker compose -f docker-compose.yml -f docker-compose.gpu.yml up`
+#            requires the nvidia-container-toolkit on the host.
+#
+#   Intel:   requires /dev/dri on the host (i915/xe driver). Group 44 (render).
+#            For SYCL/Level-Zero support inside the container, the base image
+#            must have the Intel oneAPI runtime (not included by default).
+
+services:
+  api:
+    # --- NVIDIA ---
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+    # --- Intel ---
+    devices:
+      - /dev/dri:/dev/dri
+    group_add:
+      - "44"
+    environment:
+      - ONEAPI_DEVICE_SELECTOR=level_zero:gpu
+
+  dashboard:
+    # --- NVIDIA ---
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+    # --- Intel ---
+    devices:
+      - /dev/dri:/dev/dri
+    group_add:
+      - "44"
+    environment:
+      - ONEAPI_DEVICE_SELECTOR=level_zero:gpu
